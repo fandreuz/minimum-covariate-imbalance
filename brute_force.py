@@ -19,11 +19,13 @@ def extract_k(l):
     return list(map(len, l))
 
 
-def compute_imbalance(map_L_prime_to_value, S, l):
+def compute_imbalance(map_L_prime_to_value, S, l, P):
     s = 0
     for p in range(P):
         S = list(S)
-        values, counts = np.unique(map_L_prime_to_value[p][S], return_counts=True)
+        values, counts = np.unique(
+            map_L_prime_to_value[p][S], return_counts=True
+        )
         # we might be missing some values in values
         full_counts = np.zeros(len(l[p]), dtype=int)
         full_counts[values] = counts
@@ -50,7 +52,7 @@ def brute_force(l, L_prime):
     m = 10000000
     S_m = None
     for S in combinations(z, n):
-        mi = compute_imbalance(map_L_prime_to_value, S, l)
+        mi = compute_imbalance(map_L_prime_to_value, S, l, P)
         if mi < m:
             m = mi
             S_m = [S]
