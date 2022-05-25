@@ -1,7 +1,12 @@
 from brute_force import extract_k, extract_n, extract_n_prime
+from utils import print_time
 
 import numpy as np
 import gurobipy as gb
+
+@print_time
+def solve(problem):
+    problem.optimize()
 
 # each k[i] consecutive rows of A contain 1 in the j-th
 # column if for the (i+1)-th covariate we have that
@@ -45,7 +50,7 @@ def min_imbalance_solver(l, L_prime, verbose=False):
     # 1a
     min_imbalance.setObjective(gb.quicksum(y))
 
-    min_imbalance.optimize()
+    solve(min_imbalance)
 
     if verbose:
         if min_imbalance.status == 2:
@@ -92,7 +97,7 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False):
     # 2a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
 
-    min_imbalance.optimize()
+    solve(min_imbalance)
 
     if verbose:
         if min_imbalance.status == 2:
@@ -174,7 +179,7 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
     # 3a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
 
-    min_imbalance.optimize()
+    solve(min_imbalance)
 
     if verbose:
         if min_imbalance.status == 2:

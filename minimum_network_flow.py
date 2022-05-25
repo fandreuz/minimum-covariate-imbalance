@@ -1,5 +1,6 @@
 from linear_formulation import compute_A, compute_U
 from brute_force import extract_k, extract_n, extract_n_prime
+from utils import print_time
 
 from ortools.graph import pywrapgraph
 import networkx as nx
@@ -69,8 +70,11 @@ def min_imbalance_solver_networkx(l, L_prime, verbose=False):
         for edg in net.edges(data=True):
             print("- > {}".format(edg))
 
-    dc = nx.min_cost_flow(net)
-    return min_imbalance_networkx_extract_result(dc)
+    @print_time
+    def solve():
+        return nx.min_cost_flow(net)
+
+    return min_imbalance_networkx_extract_result(solve())
 
 
 def convert_networkx_to_ortools(net, ortools_flow_obj):
@@ -107,7 +111,12 @@ def min_imbalance_solver_google(l, L_prime):
     min_cost_flow = pywrapgraph.SimpleMinCostFlow()
     convert_networkx_to_ortools(G, min_cost_flow)
 
-    status = min_cost_flow.Solve()
+    @print_time
+    def solve():
+        return min_cost_flow.Solve()
+
+    status = solve()
+
     if status == min_cost_flow.INFEASIBLE:
         print("Infeasible")
     elif status == min_cost_flow.UNBALANCED:
