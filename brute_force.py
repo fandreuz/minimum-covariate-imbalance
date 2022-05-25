@@ -23,9 +23,7 @@ def compute_imbalance(map_L_prime_to_value, S, l):
     s = 0
     for p in range(P):
         S = list(S)
-        values, counts = np.unique(
-            map_L_prime_to_value[p][S], return_counts=True
-        )
+        values, counts = np.unique(map_L_prime_to_value[p][S], return_counts=True)
         # we might be missing some values in values
         full_counts = np.zeros(len(l[p]), dtype=int)
         full_counts[values] = counts

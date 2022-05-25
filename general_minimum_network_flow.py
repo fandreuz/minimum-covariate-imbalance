@@ -8,6 +8,7 @@ import numpy as np
 from functools import partial
 from math import floor
 
+
 def compute_zero_cost_arc_capacity(li, q, n):
     return floor(q / n * li)
 
@@ -91,16 +92,14 @@ def general_min_imbalance_network(l, L_prime, q, max_power):
             0,
             (0, i),
             weight=1,
-            capacity=compute_zero_cost_arc_capacity(l[0][i], q, n)
-            * powers[top],
+            capacity=compute_zero_cost_arc_capacity(l[0][i], q, n) * powers[top],
         )
     for i in range(k[1]):
         G.add_edge(
             (1, i),
             1,
             weight=1,
-            capacity=compute_zero_cost_arc_capacity(l[1][i], q, n)
-            * powers[top],
+            capacity=compute_zero_cost_arc_capacity(l[1][i], q, n) * powers[top],
         )
 
     # capacity one
@@ -108,20 +107,14 @@ def general_min_imbalance_network(l, L_prime, q, max_power):
         G.add_edge(
             0,
             (0, i),
-            weight=compute_one_capacity_arc_weight(l[0][i], q, n)
-            * 2
-            / q
-            * powers[top],
+            weight=compute_one_capacity_arc_weight(l[0][i], q, n) * 2 / q * powers[top],
             capacity=1,
         )
     for i in range(k[1]):
         G.add_edge(
             (1, i),
             1,
-            weight=compute_one_capacity_arc_weight(l[1][i], q, n)
-            * 2
-            / q
-            * powers[top],
+            weight=compute_one_capacity_arc_weight(l[1][i], q, n) * 2 / q * powers[top],
             capacity=1,
         )
 
@@ -155,12 +148,8 @@ def general_min_imbalance_networkx_extract_result(G, dc):
     return s
 
 
-def general_min_imbalance_solver_networkx(
-    l, L_prime, q, verbose=False, max_power=10
-):
-    net, scale = general_min_imbalance_network(
-        l, L_prime, q, max_power=max_power
-    )
+def general_min_imbalance_solver_networkx(l, L_prime, q, verbose=False, max_power=10):
+    net, scale = general_min_imbalance_network(l, L_prime, q, max_power=max_power)
 
     if verbose:
         for node in net.nodes(data=True):
@@ -173,9 +162,7 @@ def general_min_imbalance_solver_networkx(
 
 
 def general_min_imbalance_solver_google(l, L_prime, q, max_power=10):
-    G, scale = general_min_imbalance_network(
-        l, L_prime, q, max_power=max_power
-    )
+    G, scale = general_min_imbalance_network(l, L_prime, q, max_power=max_power)
 
     min_cost_flow = pywrapgraph.SimpleMinCostFlow()
     convert_networkx_to_ortools(G, min_cost_flow)

@@ -87,9 +87,7 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False):
         min_imbalance.addConstr(A[sl] @ z + d[sl] - e[sl] == l[sl])
 
     # 2d
-    min_imbalance.addConstr(
-        gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0
-    )
+    min_imbalance.addConstr(gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0)
 
     # 2a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
@@ -149,9 +147,7 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
     U = compute_U(A, k)
 
     # 3g (i2 changes faster than i1)
-    x = min_imbalance.addMVar(
-        U.shape[0] * U.shape[1], lb=0.0, ub=U.flatten(order="C")
-    )
+    x = min_imbalance.addMVar(U.shape[0] * U.shape[1], lb=0.0, ub=U.flatten(order="C"))
     # 3f
     e = min_imbalance.addMVar(sum(k), lb=0.0)
     d = min_imbalance.addMVar(sum(k), lb=0.0)
@@ -170,14 +166,10 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
             )
 
         # 3d
-        min_imbalance.addConstr(
-            gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0
-        )
+        min_imbalance.addConstr(gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0)
 
         # 3e
-        min_imbalance.addConstr(
-            gb.quicksum(e[k[0] :]) - gb.quicksum(d[k[0] :]) == 0
-        )
+        min_imbalance.addConstr(gb.quicksum(e[k[0] :]) - gb.quicksum(d[k[0] :]) == 0)
 
     # 3a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
