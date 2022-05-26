@@ -4,9 +4,11 @@ from utils import print_time
 import numpy as np
 import gurobipy as gb
 
+
 @print_time
 def solve(problem):
     problem.optimize()
+
 
 # each k[i] consecutive rows of A contain 1 in the j-th
 # column if for the (i+1)-th covariate we have that
