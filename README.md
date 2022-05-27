@@ -24,7 +24,7 @@ $i \in k_p$ is the level among the allowed levels for the $p$-th covariate.
 The objective of the problem is the identification, among another set called
 *control sample*, of a subset $S$ of size $n$ such that the following holds:
 
-$$S = \min_{T: |T| = n} \sum_{p=1}^P \sum_{i=1}^{k_p} ||T \cap L'_{p,i}| - \ell_{p,i}|$$
+$$ S = \min_{T: |T| = n} \sum_{p=1}^P \sum_{i=1}^{k_p} ||T \cap L'_{p,i}| - \ell_{p,i}| $$
 
 where $T \cap L'_{p,i}$ is the subset of $T$ such that all the elements are in
 the $i$-th level with respect to the $p$-th covariate.
