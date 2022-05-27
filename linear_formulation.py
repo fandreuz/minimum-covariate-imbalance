@@ -4,6 +4,9 @@ from utils import print_time
 import numpy as np
 import gurobipy as gb
 
+# Gurobi time upper bound
+time_limit = 10 * 60
+
 
 @print_time
 def solve(problem):
@@ -29,6 +32,7 @@ def min_imbalance_solver(l, L_prime, verbose=False):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
+    min_imbalance.setParam("TimeLimit", time_limit)
 
     n = extract_n(l)
     k = extract_k(l)
@@ -53,12 +57,9 @@ def min_imbalance_solver(l, L_prime, verbose=False):
     min_imbalance.setObjective(gb.quicksum(y))
 
     solve(min_imbalance)
+    if min_imbalance.status != gb.GRB.OPTIMAL:
+        return None
 
-    if verbose:
-        if min_imbalance.status == 2:
-            print("OK")
-        else:
-            print("Bad things happened")
     return z.x, sum(y.x)
 
 
@@ -66,6 +67,7 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
+    min_imbalance.setParam("TimeLimit", time_limit)
 
     n = extract_n(l)
     k = extract_k(l)
@@ -94,18 +96,17 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False):
         min_imbalance.addConstr(A[sl] @ z + d[sl] - e[sl] == l[sl])
 
     # 2d
-    min_imbalance.addConstr(gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0)
+    min_imbalance.addConstr(
+        gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0
+    )
 
     # 2a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
 
     solve(min_imbalance)
+    if min_imbalance.status != gb.GRB.OPTIMAL:
+        return None
 
-    if verbose:
-        if min_imbalance.status == 2:
-            print("OK")
-        else:
-            print("Bad things happened")
     return z.x, sum(e.x) + sum(d.x)
 
 
@@ -141,6 +142,7 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
+    min_imbalance.setParam("TimeLimit", time_limit)
 
     n = extract_n(l)
     k = extract_k(l)
@@ -154,7 +156,9 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
     U = compute_U(A, k)
 
     # 3g (i2 changes faster than i1)
-    x = min_imbalance.addMVar(U.shape[0] * U.shape[1], lb=0.0, ub=U.flatten(order="C"))
+    x = min_imbalance.addMVar(
+        U.shape[0] * U.shape[1], lb=0.0, ub=U.flatten(order="C")
+    )
     # 3f
     e = min_imbalance.addMVar(sum(k), lb=0.0)
     d = min_imbalance.addMVar(sum(k), lb=0.0)
@@ -173,19 +177,19 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
             )
 
         # 3d
-        min_imbalance.addConstr(gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0)
+        min_imbalance.addConstr(
+            gb.quicksum(e[: k[0]]) - gb.quicksum(d[: k[0]]) == 0
+        )
 
         # 3e
-        min_imbalance.addConstr(gb.quicksum(e[k[0] :]) - gb.quicksum(d[k[0] :]) == 0)
+        min_imbalance.addConstr(
+            gb.quicksum(e[k[0] :]) - gb.quicksum(d[k[0] :]) == 0
+        )
 
     # 3a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
 
     solve(min_imbalance)
-
-    if verbose:
-        if min_imbalance.status == 2:
-            print("OK")
-        else:
-            print("Bad things happened")
+    if min_imbalance.status != gb.GRB.OPTIMAL:
+        return None
     return X_to_Z(A, k, x.x), sum(e.x) + sum(d.x)
