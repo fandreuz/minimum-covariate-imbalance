@@ -10,9 +10,10 @@ from linear_formulation import (
 
 from utils import generate_problems
 
-for n in range(5, 101, 5):
-    for nprime in range(n+5, 101, 5):
-        for k1, k2 in [(3,3), (4,4), (5,5), (3,10)]:
+for n in range(1000, 10001, 1000):
+    for nprime in range(n+1000, 1000001, 1000):
+        for k1, k2 in [(3,3), (50,50), (100,100)]:
+            print('n {}, n_prime {}, k1 {}, k2 {}'.format(n, nprime, k1, k2))
             l, L_prime = generate_problems(n, nprime, k1, k2)
 
             min_imbalance_solver(l, L_prime)
