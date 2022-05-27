@@ -12,7 +12,7 @@ from utils import generate_problems
 from rich.progress import track
 from itertools import product
 
-data = list(product(range(1000, 10001, 1000), range(1100, 1000001, 1000)))
+data = list(product(range(1000, 10001, 1000), range(10000, 1000001, 10000)))
 for n, nprime in track(data, description="Computing all cases..."):
     if nprime < n + 1000:
         continue
