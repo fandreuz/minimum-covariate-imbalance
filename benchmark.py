@@ -39,7 +39,7 @@ for n in range(10, 501, 25):
                 print("A computed in {}s".format(time() - start))
 
                 start = time()
-                U = compute_U(A, k)
+                U = compute_U(A, k1)
                 print("U computed in {}s".format(time() - start))
 
                 if (

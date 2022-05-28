@@ -135,17 +135,16 @@ def min_imbalance_solver_alt(
 
 
 # this assumes that P=2
-def compute_U(A, k):
-    positive_A = (A > 0).toarray()
-    A1 = positive_A[: k[0]]
-    A2 = positive_A[k[0] :]
-    return np.count_nonzero(np.logical_and(A1[:, None], A2[None]), axis=-1)
+def compute_U(A, k0):
+    A1 = A[:k0]
+    A2 = A[k0:]
+    return A1.dot(A2.T).toarray()
 
 
-def X_to_Z(A, k, X):
-    A = A.toarray()
-    A1 = A[: k[0]]
-    A2 = A[k[0] :]
+def X_to_Z(A, k0, X):
+    A = (A > 0).toarray()
+    A1 = A[: k0]
+    A2 = A[k0 :]
 
     B = np.logical_and(A1[:, None], A2[None])
 
@@ -178,9 +177,9 @@ def min_imbalance_solver_mcnf(
 
     if A is None and U is None:
         A = compute_A(L_prime, k, n_prime)
-        U = compute_U(A, k)
+        U = compute_U(A, k[0])
     elif U is None:
-        U = compute_U(A, k)
+        U = compute_U(A, k[0])
 
     # 3g (i2 changes faster than i1)
     x = min_imbalance.addMVar(
@@ -225,6 +224,6 @@ def min_imbalance_solver_mcnf(
         return None
 
     if path:
-        return X_to_Z(A, k, x.x), sum(e.x) + sum(d.x)
+        return X_to_Z(A, k[0], x.x), sum(e.x) + sum(d.x)
     else:
         return sum(e.x) + sum(d.x)

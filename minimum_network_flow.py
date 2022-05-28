@@ -43,9 +43,9 @@ def min_imbalance_network(l, L_prime, A=None, U=None):
 
     if A is None and U is None:
         A = compute_A(L_prime, k, n_prime)
-        U = compute_U(A, k)
+        U = compute_U(A, k[0])
     elif U is None:
-        U = compute_U(A, k)
+        U = compute_U(A, k[0])
 
     for i1, i2 in zip(*np.where(U)):
         G.add_edge((0, i1), (1, i2), capacity=U[i1, i2], weight=0)
