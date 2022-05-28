@@ -16,11 +16,13 @@ from time import time
 time_file = open("benchmark.txt", "w")
 
 for n in range(10, 501, 25):
-    for nprime in [100000, 250000, 500000, 750000, 1000000]:
+    for nprime in [10000, 25000, 50000, 75000, 100000]:
         for func in [
             lambda x: int(x / 3),
             lambda x: int(x / 2),
-            lambda x: x - 2,
+            lambda x: x,
+            lambda x: x*2,
+            lambda x: x*3,
         ]:
             k1 = func(n)
             k2 = func(n)
