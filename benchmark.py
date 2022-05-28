@@ -10,7 +10,7 @@ from linear_formulation import (
 
 from utils import generate_problems
 
-for n in range(1000, 10001, 1000):
+for n in range(10, 501, 25):
     for nprime in [100000, 250000, 500000, 750000, 1000000]:
         for func in [lambda x: int(x / 3), lambda x: int(x/2), lambda x: x - 2]:
             k1 = func(n)
