@@ -6,6 +6,8 @@ from linear_formulation import (
     min_imbalance_solver_mcnf,
     min_imbalance_solver_alt,
     min_imbalance_solver,
+    compute_A,
+    compute_U
 )
 
 from utils import generate_problems
@@ -15,17 +17,21 @@ for n in range(10, 501, 25):
         for func in [lambda x: int(x / 3), lambda x: int(x/2), lambda x: x - 2]:
             k1 = func(n)
             k2 = func(n)
+            k = (k1,k2)
+
             while True:
                 print("n {}, n_prime {}, k1 {}, k2 {}".format(n, nprime, k1, k2))
                 l, L_prime = generate_problems(n, nprime, k1, k2)
+                A = compute_A(L_prime, k, nprime)
+                U = compute_U(A, k)
 
-                if min_imbalance_solver(l, L_prime) is None:
+                if min_imbalance_solver(l, L_prime, A=A) is None:
                     print("Timeout!")
                     continue
 
-                min_imbalance_solver_alt(l, L_prime)
-                min_imbalance_solver_mcnf(l, L_prime)
-                min_imbalance_solver_networkx(l, L_prime)
-                min_imbalance_solver_google(l, L_prime)
+                min_imbalance_solver_alt(l, L_prime, A=A)
+                min_imbalance_solver_mcnf(l, L_prime, A=A)
+                min_imbalance_solver_networkx(l, L_prime, A=A, U=U)
+                min_imbalance_solver_google(l, L_prime, A=A, U=U)
                 print("-----")
                 break
