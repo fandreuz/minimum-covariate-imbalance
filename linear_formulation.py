@@ -28,7 +28,9 @@ def compute_A(L_prime, k, n_prime):
         [L_prime[p][i] for p in range(len(L_prime)) for i in range(k[p])]
     )
     data = np.ones_like(row_ind, dtype=int)
-    return sparse.coo_matrix((data, (row_ind, col_ind))).tocsr()
+    return sparse.coo_matrix(
+        (data, (row_ind, col_ind)), dtype=int, shape=shape
+    ).tocsr()
 
 
 def min_imbalance_solver(
@@ -143,8 +145,8 @@ def compute_U(A, k0):
 
 def X_to_Z(A, k0, X):
     A = (A > 0).toarray()
-    A1 = A[: k0]
-    A2 = A[k0 :]
+    A1 = A[:k0]
+    A2 = A[k0:]
 
     B = np.logical_and(A1[:, None], A2[None])
 
