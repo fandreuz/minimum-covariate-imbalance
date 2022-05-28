@@ -1,5 +1,6 @@
 from brute_force import extract_k, extract_n, extract_n_prime
 from utils import print_time
+from scipy import sparse
 
 import numpy as np
 import gurobipy as gb
@@ -18,17 +19,24 @@ def solve(problem):
 # z[j] belongs to the k-th bucket of the covariate i,
 # where k is the offset from k[i]+sum(k[:i])
 def compute_A(L_prime, k, n_prime):
-    A = np.zeros((sum(k), n_prime), dtype=int)
-    current_row = 0
-    for p in range(len(L_prime)):
-        Lp_prime = L_prime[p]
-        for i in range(k[p]):
-            A[current_row, Lp_prime[i]] = 1
-            current_row += 1
-    return A
+    csk = np.concatenate([[0], np.cumsum(k[:-1])])
+    shape = (csk[-1] + k[-1], n_prime)
+
+    row_ind = np.concatenate(
+        [
+            np.repeat(csk[p] + i, len(L_prime[p][i]))
+            for p in range(len(L_prime))
+            for i in range(k[p])
+        ]
+    )
+    col_ind = np.concatenate(
+        [L_prime[p][i] for p in range(len(L_prime)) for i in range(k[p])]
+    )
+    data = np.ones_like(row_ind, dtype=int)
+    return sparse.coo_matrix((data, (row_ind, col_ind))).tocsr()
 
 
-def min_imbalance_solver(l, L_prime, verbose=False):
+def min_imbalance_solver(l, L_prime, verbose=False, A=None):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -44,12 +52,14 @@ def min_imbalance_solver(l, L_prime, verbose=False):
     z = min_imbalance.addMVar(n_prime, vtype=gb.GRB.BINARY)
     y = min_imbalance.addMVar(sum(k))
 
-    A = compute_A(L_prime, k, n_prime)
+    if A is None:
+        A = compute_A(L_prime, k, n_prime)
 
+    Az = A @ z
     # 1b
-    min_imbalance.addConstr(A @ z - l <= y)
+    min_imbalance.addConstr(Az - l <= y)
     # 1c
-    min_imbalance.addConstr(l - A @ z <= y)
+    min_imbalance.addConstr(l - Az <= y)
     # 1d
     min_imbalance.addConstr(gb.quicksum(z) == n)
 
@@ -63,7 +73,7 @@ def min_imbalance_solver(l, L_prime, verbose=False):
     return z.x, sum(y.x)
 
 
-def min_imbalance_solver_alt(l, L_prime, verbose=False):
+def min_imbalance_solver_alt(l, L_prime, verbose=False, A=None):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -83,7 +93,8 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False):
     e = min_imbalance.addMVar(sum(k), lb=0.0)
     d = min_imbalance.addMVar(sum(k), lb=0.0)
 
-    A = compute_A(L_prime, k, n_prime)
+    if A is None:
+        A = compute_A(L_prime, k, n_prime)
 
     for p in range(2):
         # smallest index for the covariate p
@@ -113,8 +124,8 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False):
 def compute_U(A, k):
     U = np.empty((k[0], k[1]), dtype=int)
 
-    A1 = A[: k[0]] > 0
-    A2 = A[k[0] :] > 0
+    A1 = (A[: k[0]] > 0).toarray()
+    A2 = (A[k[0] :] > 0).toarray()
 
     return np.count_nonzero(np.logical_and(A1[:, None], A2[None]), axis=-1)
 
@@ -122,8 +133,8 @@ def compute_U(A, k):
 def X_to_Z(A, k, X):
     U = np.empty((k[0], k[1]), dtype=int)
 
-    A1 = A[: k[0]] > 0
-    A2 = A[k[0] :] > 0
+    A1 = (A[: k[0]] > 0).toarray()
+    A2 = (A[k[0] :] > 0).toarray()
 
     B = np.logical_and(A1[:, None], A2[None])
 
@@ -138,7 +149,7 @@ def X_to_Z(A, k, X):
     return z
 
 
-def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
+def min_imbalance_solver_mcnf(l, L_prime, verbose=False, A=None, U=None):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -152,8 +163,11 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False):
 
     assert P == 2
 
-    A = compute_A(L_prime, k, n_prime)
-    U = compute_U(A, k)
+    if A is None and U is None:
+        A = compute_A(L_prime, k, n_prime)
+        U = compute_U(A, k)
+    elif U is None:
+        U = compute_U(A, k)
 
     # 3g (i2 changes faster than i1)
     x = min_imbalance.addMVar(

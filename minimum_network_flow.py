@@ -9,7 +9,7 @@ import numpy as np
 infinity = 100000000
 
 # we set all data explicitly because this will be used by another solver
-def min_imbalance_network(l, L_prime):
+def min_imbalance_network(l, L_prime, A=None, U=None):
     G = nx.DiGraph()
 
     G.add_node(0, demand=0)
@@ -40,13 +40,15 @@ def min_imbalance_network(l, L_prime):
     # x_{i1,i2}
     l = np.array(np.concatenate(l))
     n_prime = extract_n_prime(L_prime, k)
-    A = compute_A(L_prime, k, n_prime)
-    U = compute_U(A, k)
 
-    for i1 in range(k[0]):
-        for i2 in range(k[1]):
-            if U[i1, i2] > 0:
-                G.add_edge((0, i1), (1, i2), capacity=U[i1, i2], weight=0)
+    if A is None and U is None:
+        A = compute_A(L_prime, k, n_prime)
+        U = compute_U(A, k)
+    elif U is None:
+        U = compute_U(A, k)
+
+    for i1, i2 in zip(*np.where(U)):
+        G.add_edge((0, i1), (1, i2), capacity=U[i1, i2], weight=0)
 
     return G
 
@@ -61,8 +63,8 @@ def min_imbalance_networkx_extract_result(dc):
     return s
 
 
-def min_imbalance_solver_networkx(l, L_prime, verbose=False):
-    net = min_imbalance_network(l, L_prime)
+def min_imbalance_solver_networkx(l, L_prime, verbose=False, A=None, U=None):
+    net = min_imbalance_network(l, L_prime, A=A, U=U)
 
     if verbose:
         for node in net.nodes(data=True):
@@ -90,9 +92,6 @@ def convert_networkx_to_ortools(net, ortools_flow_obj):
             mapping[dest] = i
             i += 1
 
-        assert int(data["capacity"]) == data["capacity"]
-        assert int(data["weight"]) == data["weight"]
-
         arc = ortools_flow_obj.AddArcWithCapacityAndUnitCost(
             mapping[source],
             mapping[dest],
@@ -101,12 +100,11 @@ def convert_networkx_to_ortools(net, ortools_flow_obj):
         )
 
     for node, data in net.nodes(data=True):
-        assert int(data["demand"]) == data["demand"]
         ortools_flow_obj.SetNodeSupply(mapping[node], -int(data["demand"]))
 
 
-def min_imbalance_solver_google(l, L_prime):
-    G = min_imbalance_network(l, L_prime)
+def min_imbalance_solver_google(l, L_prime, A=None, U=None):
+    G = min_imbalance_network(l, L_prime, A=A, U=U)
 
     min_cost_flow = pywrapgraph.SimpleMinCostFlow()
     convert_networkx_to_ortools(G, min_cost_flow)
