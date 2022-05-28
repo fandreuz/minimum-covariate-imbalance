@@ -21,8 +21,8 @@ for n in range(10, 501, 25):
             lambda x: int(x / 3),
             lambda x: int(x / 2),
             lambda x: x,
-            lambda x: x*2,
-            lambda x: x*3,
+            lambda x: x * 2,
+            lambda x: x * 3,
         ]:
             k1 = func(n)
             k2 = func(n)
@@ -35,7 +35,15 @@ for n in range(10, 501, 25):
                 l, L_prime = generate_problems(n, nprime, k1, k2)
 
                 start = time()
-                A = compute_A(L_prime, k, nprime)
+                try:
+                    A = compute_A(L_prime, k, nprime)
+                except:
+                    print(
+                        "An error occurred while computing A. L_prime: {}, k: {}".format(
+                            L_prime, j
+                        )
+                    )
+                    continue
                 print("A computed in {}s".format(time() - start))
 
                 start = time()
