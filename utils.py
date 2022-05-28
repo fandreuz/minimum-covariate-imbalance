@@ -1,15 +1,26 @@
 from time import time
 import numpy as np
+from functools import wraps
 
 
-def print_time(func):
-    def wrapper(*args, **kwargs):
-        start = time()
-        value = func(*args, **kwargs)
-        print("# {}".format(time() - start))
-        return value
+def print_time(time_file):
+    def decorator_print_time(func):
+        @wraps(func)
+        def wrapper_print_time(*args, **kwargs):
+            start = time()
+            value = func(*args, **kwargs)
+            end = time() - start
 
-    return wrapper
+            s = "# {}".format(end)
+            if time_file:
+                time_file.write(s + "\n")
+            else:
+                print(s)
+            return value
+
+        return wrapper_print_time
+
+    return decorator_print_time
 
 
 def group_by(a):
@@ -51,7 +62,9 @@ def random_sample(P, n, k, probability_generator=None):
 
 
 def random_Lprime(P, n_prime, k, probability_generator=None):
-    return random_sample(P, n_prime, k, probability_generator=probability_generator)
+    return random_sample(
+        P, n_prime, k, probability_generator=probability_generator
+    )
 
 
 def print_Lprime(L_prime):

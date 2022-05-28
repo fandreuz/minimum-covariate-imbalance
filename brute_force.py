@@ -1,8 +1,6 @@
 from itertools import combinations, product
 import numpy as np
 
-from utils import print_time
-
 # samples from the control samples are indexed from 0 to n_prime
 def extract_n_prime(L_prime, k):
     M = 0
@@ -25,7 +23,9 @@ def compute_imbalance(map_L_prime_to_value, S, l, P):
     s = 0
     for p in range(P):
         S = list(S)
-        values, counts = np.unique(map_L_prime_to_value[p][S], return_counts=True)
+        values, counts = np.unique(
+            map_L_prime_to_value[p][S], return_counts=True
+        )
         # we might be missing some values in values
         full_counts = np.zeros(len(l[p]), dtype=int)
         full_counts[values] = counts
@@ -33,7 +33,6 @@ def compute_imbalance(map_L_prime_to_value, S, l, P):
     return s
 
 
-@print_time
 def brute_force(l, L_prime):
     k = extract_k(l)
     n_prime = extract_n_prime(L_prime, k)

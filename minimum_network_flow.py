@@ -63,7 +63,9 @@ def min_imbalance_networkx_extract_result(dc):
     return s
 
 
-def min_imbalance_solver_networkx(l, L_prime, verbose=False, A=None, U=None):
+def min_imbalance_solver_networkx(
+    l, L_prime, verbose=False, A=None, U=None, time_file=None
+):
     net = min_imbalance_network(l, L_prime, A=A, U=U)
 
     if verbose:
@@ -72,7 +74,7 @@ def min_imbalance_solver_networkx(l, L_prime, verbose=False, A=None, U=None):
         for edg in net.edges(data=True):
             print("- > {}".format(edg))
 
-    @print_time
+    @print_time(time_file)
     def solve():
         return nx.min_cost_flow(net)
 
@@ -103,13 +105,13 @@ def convert_networkx_to_ortools(net, ortools_flow_obj):
         ortools_flow_obj.SetNodeSupply(mapping[node], -int(data["demand"]))
 
 
-def min_imbalance_solver_google(l, L_prime, A=None, U=None):
+def min_imbalance_solver_google(l, L_prime, A=None, U=None, time_file=None):
     G = min_imbalance_network(l, L_prime, A=A, U=U)
 
     min_cost_flow = pywrapgraph.SimpleMinCostFlow()
     convert_networkx_to_ortools(G, min_cost_flow)
 
-    @print_time
+    @print_time(time_file)
     def solve():
         return min_cost_flow.Solve()
 

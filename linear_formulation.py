@@ -9,11 +9,6 @@ import gurobipy as gb
 time_limit = 10 * 60
 
 
-@print_time
-def solve(problem):
-    problem.optimize()
-
-
 # each k[i] consecutive rows of A contain 1 in the j-th
 # column if for the (i+1)-th covariate we have that
 # z[j] belongs to the k-th bucket of the covariate i,
@@ -36,7 +31,7 @@ def compute_A(L_prime, k, n_prime):
     return sparse.coo_matrix((data, (row_ind, col_ind))).tocsr()
 
 
-def min_imbalance_solver(l, L_prime, verbose=False, A=None):
+def min_imbalance_solver(l, L_prime, verbose=False, A=None, time_file=None):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -66,6 +61,10 @@ def min_imbalance_solver(l, L_prime, verbose=False, A=None):
     # 1a
     min_imbalance.setObjective(gb.quicksum(y))
 
+    @print_time(time_file)
+    def solve(problem):
+        problem.optimize()
+
     solve(min_imbalance)
     if min_imbalance.status != gb.GRB.OPTIMAL:
         return None
@@ -73,7 +72,9 @@ def min_imbalance_solver(l, L_prime, verbose=False, A=None):
     return z.x, sum(y.x)
 
 
-def min_imbalance_solver_alt(l, L_prime, verbose=False, A=None):
+def min_imbalance_solver_alt(
+    l, L_prime, verbose=False, A=None, time_file=None
+):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -114,6 +115,10 @@ def min_imbalance_solver_alt(l, L_prime, verbose=False, A=None):
     # 2a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
 
+    @print_time(time_file)
+    def solve(problem):
+        problem.optimize()
+
     solve(min_imbalance)
     if min_imbalance.status != gb.GRB.OPTIMAL:
         return None
@@ -149,7 +154,9 @@ def X_to_Z(A, k, X):
     return z
 
 
-def min_imbalance_solver_mcnf(l, L_prime, verbose=False, A=None, U=None):
+def min_imbalance_solver_mcnf(
+    l, L_prime, verbose=False, A=None, U=None, time_file=None
+):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -202,6 +209,10 @@ def min_imbalance_solver_mcnf(l, L_prime, verbose=False, A=None, U=None):
 
     # 3a
     min_imbalance.setObjective(gb.quicksum(e) + gb.quicksum(d))
+
+    @print_time(time_file)
+    def solve(problem):
+        problem.optimize()
 
     solve(min_imbalance)
     if min_imbalance.status != gb.GRB.OPTIMAL:
