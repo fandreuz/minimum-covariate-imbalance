@@ -11,6 +11,7 @@ from linear_formulation import (
 )
 
 from utils import generate_problems
+from time import time
 
 for n in range(10, 501, 25):
     for nprime in [100000, 250000, 500000, 750000, 1000000]:
@@ -22,8 +23,14 @@ for n in range(10, 501, 25):
             while True:
                 print("n {}, n_prime {}, k1 {}, k2 {}".format(n, nprime, k1, k2))
                 l, L_prime = generate_problems(n, nprime, k1, k2)
+
+                start = time()
                 A = compute_A(L_prime, k, nprime)
+                print('A computed in {}s'.format(time() - start))
+
+                start = time()
                 U = compute_U(A, k)
+                print('U computed in {}s'.format(time() - start))
 
                 if min_imbalance_solver(l, L_prime, A=A) is None:
                     print("Timeout!")
