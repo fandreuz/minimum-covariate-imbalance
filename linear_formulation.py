@@ -31,7 +31,9 @@ def compute_A(L_prime, k, n_prime):
     return sparse.coo_matrix((data, (row_ind, col_ind))).tocsr()
 
 
-def min_imbalance_solver(l, L_prime, verbose=False, A=None, time_file=None):
+def min_imbalance_solver(
+    l, L_prime, verbose=False, A=None, time_file=None, path=False
+):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
@@ -69,11 +71,14 @@ def min_imbalance_solver(l, L_prime, verbose=False, A=None, time_file=None):
     if min_imbalance.status != gb.GRB.OPTIMAL:
         return None
 
-    return z.x, sum(y.x)
+    if path:
+        return z.x, sum(y.x)
+    else:
+        return sum(y.x)
 
 
 def min_imbalance_solver_alt(
-    l, L_prime, verbose=False, A=None, time_file=None
+    l, L_prime, verbose=False, A=None, time_file=None, path=False
 ):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
@@ -123,9 +128,13 @@ def min_imbalance_solver_alt(
     if min_imbalance.status != gb.GRB.OPTIMAL:
         return None
 
-    return z.x, sum(e.x) + sum(d.x)
+    if path:
+        return z.x, sum(e.x) + sum(d.x)
+    else:
+        return sum(e.x) + sum(d.x)
 
 
+# this assumes that P=2
 def compute_U(A, k):
     U = np.empty((k[0], k[1]), dtype=int)
 
@@ -155,7 +164,7 @@ def X_to_Z(A, k, X):
 
 
 def min_imbalance_solver_mcnf(
-    l, L_prime, verbose=False, A=None, U=None, time_file=None
+    l, L_prime, verbose=False, A=None, U=None, time_file=None, path=False
 ):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
@@ -217,4 +226,8 @@ def min_imbalance_solver_mcnf(
     solve(min_imbalance)
     if min_imbalance.status != gb.GRB.OPTIMAL:
         return None
-    return X_to_Z(A, k, x.x), sum(e.x) + sum(d.x)
+
+    if path:
+        return X_to_Z(A, k, x.x), sum(e.x) + sum(d.x)
+    else:
+        return sum(e.x) + sum(d.x)
