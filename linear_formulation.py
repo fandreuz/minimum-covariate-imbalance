@@ -136,19 +136,16 @@ def min_imbalance_solver_alt(
 
 # this assumes that P=2
 def compute_U(A, k):
-    U = np.empty((k[0], k[1]), dtype=int)
-
-    A1 = (A[: k[0]] > 0).toarray()
-    A2 = (A[k[0] :] > 0).toarray()
-
+    positive_A = (A > 0).toarray()
+    A1 = positive_A[: k[0]]
+    A2 = positive_A[k[0] :]
     return np.count_nonzero(np.logical_and(A1[:, None], A2[None]), axis=-1)
 
 
 def X_to_Z(A, k, X):
-    U = np.empty((k[0], k[1]), dtype=int)
-
-    A1 = (A[: k[0]] > 0).toarray()
-    A2 = (A[k[0] :] > 0).toarray()
+    A = A.toarray()
+    A1 = A[: k[0]]
+    A2 = A[k[0] :]
 
     B = np.logical_and(A1[:, None], A2[None])
 
