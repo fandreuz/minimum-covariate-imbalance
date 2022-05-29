@@ -15,7 +15,7 @@ from time import time
 
 time_file = open("benchmark.txt", "w")
 
-for n in range(10, 501, 25):
+for n in range(500, 5001, 500):
     for nprime in [10000, 25000, 50000, 75000, 100000]:
         for func in [
             lambda x: int(x / 3),
