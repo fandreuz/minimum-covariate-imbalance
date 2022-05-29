@@ -34,12 +34,13 @@ def compute_A(L_prime, k, n_prime):
 
 
 def min_imbalance_solver(
-    l, L_prime, verbose=False, A=None, time_file=None, path=False
+    l, L_prime, verbose=False, A=None, time_file=None, path=False, method=-1
 ):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
     min_imbalance.setParam("TimeLimit", time_limit)
+    min_imbalance.setParam("Method", method)
 
     n = extract_n(l)
     k = extract_k(l)
@@ -80,12 +81,13 @@ def min_imbalance_solver(
 
 
 def min_imbalance_solver_alt(
-    l, L_prime, verbose=False, A=None, time_file=None, path=False
+    l, L_prime, verbose=False, A=None, time_file=None, path=False, method=-1
 ):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
     min_imbalance.setParam("TimeLimit", time_limit)
+    min_imbalance.setParam("Method", method)
 
     n = extract_n(l)
     k = extract_k(l)
@@ -162,12 +164,20 @@ def X_to_Z(A, k0, X):
 
 
 def min_imbalance_solver_mcnf(
-    l, L_prime, verbose=False, A=None, U=None, time_file=None, path=False
+    l,
+    L_prime,
+    verbose=False,
+    A=None,
+    U=None,
+    time_file=None,
+    path=False,
+    method=-1,
 ):
     min_imbalance = gb.Model()
     min_imbalance.modelSense = gb.GRB.MINIMIZE
     min_imbalance.setParam("outputFlag", 0)
     min_imbalance.setParam("TimeLimit", time_limit)
+    min_imbalance.setParam("Method", method)
 
     n = extract_n(l)
     k = extract_k(l)
