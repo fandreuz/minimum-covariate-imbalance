@@ -14,8 +14,11 @@ from utils import generate_problems
 from time import time
 
 with open("benchmark.txt", "w") as time_file:
-    for n in range(250, 1001, 250):
-        for nprime in [10000, 25000, 50000, 75000, 100000]:
+    for n in (10, 25, 50, 100, 500):
+        for nprime in (100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000):
+            if n >= nprime:
+                continue
+
             for func in [
                 lambda x: int(x / 3),
                 lambda x: int(x / 2),
