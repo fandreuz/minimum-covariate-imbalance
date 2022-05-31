@@ -13,6 +13,8 @@ from linear_formulation import (
 from utils import generate_problems
 from time import time
 
+repeats = 100
+
 with open("benchmark.txt", "w") as time_file:
     for n in (10, 25, 50, 100, 500):
         for nprime in (100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000):
@@ -30,7 +32,7 @@ with open("benchmark.txt", "w") as time_file:
                 k2 = func(n)
                 k = (k1, k2)
 
-                while True:
+                for i in range(repeats):
                     print(
                         "n {}, n_prime {}, k1 {}, k2 {}".format(n, nprime, k1, k2)
                     )
@@ -68,4 +70,3 @@ with open("benchmark.txt", "w") as time_file:
                         l, L_prime, A=A, U=U, time_file=time_file
                     )
                     print("-----")
-                    break
