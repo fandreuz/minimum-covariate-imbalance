@@ -1,4 +1,4 @@
-from linear_formulation import compute_A, compute_U
+from mip_formulation import compute_A, compute_U
 from brute_force import extract_k, extract_n, extract_n_prime
 from utils import print_time
 

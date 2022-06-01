@@ -1,4 +1,4 @@
-from linear_formulation import compute_A, compute_U
+from mip_formulation import compute_A, compute_U
 from brute_force import extract_k, extract_n, extract_n_prime
 from minimum_network_flow import infinity, convert_networkx_to_ortools
 from utils import print_time

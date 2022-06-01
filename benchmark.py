@@ -2,7 +2,7 @@ from minimum_network_flow import (
     min_imbalance_solver_networkx,
     min_imbalance_solver_google,
 )
-from linear_formulation import (
+from mip_formulation import (
     min_imbalance_solver_mcnf,
     min_imbalance_solver_alt,
     min_imbalance_solver,
