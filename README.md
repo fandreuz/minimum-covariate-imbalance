@@ -29,9 +29,54 @@ $$S = \min_{T: |T| = n} \sum_{p=1}^P \sum_{i=1}^{k_p} ||T \cap L_{p,i}'| - \ell_
 where $T \cap L'_{p,i}$ is the subset of $T$ such that all the elements are in
 the $i$-th level with respect to the $p$-th covariate.
 
-## Algorithms
+## Models implemented
 
-TODO
+- MIP model ([1], Section 2)
+  - Gurobi
+- Alternative MIP model ([1], Section 3)
+  - Gurobi
+- MCNF model ([1], Section 4)
+  - Gurobi
+  - NetworkX
+  - Google OR-Tools
+- General (`q != n`) MCNF model ([1], Section 6)
+  - NetworkX
+  - Gurobi
+
+## Running the code
+
+First of all we generate randomly a problem using the utility functions inside
+the module `utils`:
+
+```python
+from utils import generate_problems
+
+n = 5
+n_prime = 15
+k0 = k1 = 5
+
+l, L_prime = generate_problems(n, n_prime, k0, k1)
+```
+
+You can now use any method from the modules in the repository in order to solve
+the problem:
+
+```python
+# brute force solver
+from brute_force import brute_force
+brute_force(l, L_prime)
+
+# MIP model
+from mip_formulation import min_imbalance_solver, min_imbalance_solver_alt, min_imbalance_solver_mcnf
+min_imbalance_solver(l, L_prime)
+min_imbalance_solver_alt(l, L_prime)
+min_imbalance_solver_mcnf(l, L_prime)
+
+# MCNF model
+from minimum_network_flow import min_imbalance_solver_networkx, min_imbalance_solver_google
+min_imbalance_solver_networkx(l, L_prime)
+min_imbalance_solver_google(l, L_prime)
+```
 
 ## Benchmarks
 
@@ -39,7 +84,7 @@ TODO
 
 ## Reference
 
-Network flow methods for the minimum covariate imbalance problem
+[1] Network flow methods for the minimum covariate imbalance problem
 
 Dorit S. Hochbaum, Xu Rao, Jason Sauppe
 
