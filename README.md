@@ -7,7 +7,7 @@ to be NP-hard when $P$ (the number of covariates) is strictly greater than 2.
 We focused on some fast methods for the case $P = 2$, though some of the
 functions can be used also in a more general case.
 
-## Technlogies involved
+## Tools
 
 We employed several different tools in order to evaluate the best one for the
 problem. All the code is written in Python, with the support of some NumPy
