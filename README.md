@@ -80,7 +80,7 @@ min_imbalance_solver_google(l, L_prime)
 
 ## Benchmarks
 
-### Increasing `n` and `k1, k2` (`n' = 500`)
+### Increasing `n` and `k1, k2` (`n' = 500`, `k1 = k2 = n/2`)
 ![1](https://user-images.githubusercontent.com/8464342/173231385-72e6c808-6050-4203-a330-dd35437c62c0.png)
 
 ### Increasing `n'` (`n = 50`, `k1, k2 = 50`)
@@ -88,6 +88,17 @@ min_imbalance_solver_google(l, L_prime)
 
 ### Increasing `k1, k2` (`n = 100`, `n' = 1.000.000`)
 ![3](https://user-images.githubusercontent.com/8464342/173231394-1d44401c-6b3d-47e0-9f50-996de39331ba.png)
+
+### Legend
+
+- Gurobi:
+  - `Integer` : MIP formulation in [1]
+  - `Integer` : Alternative MIP formulation in [1]
+  - `Integer MCNF` : MCNF formulation implemented like a MIP
+- Google OR-Tools:
+  - `MCNF OR` : MCFN formulation
+- NetworkX:
+  - `MCNF NX` : MCFN formulation
 
 ## Reference
 
