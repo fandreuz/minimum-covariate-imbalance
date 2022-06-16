@@ -1,7 +1,7 @@
-# Optimization algorithms for the minimum covariate imbalance problem
+# Optimization models for the minimum covariate imbalance problem
 
-In this repository we implemented and experimented with several optimization
-algorithms for the minimum covariate imbalance problem. The problem is proven
+In this repository we implemented and experimented several optimization
+models for the minimum covariate imbalance problem. The problem is proven
 to be NP-hard when $P$ (the number of covariates) is strictly greater than 2.
 
 We focused on some fast methods for the case $P = 2$, though some of the
@@ -14,7 +14,7 @@ problem. All the code is written in Python, with the support of some NumPy
 functions here and there. We used the following optimization engines:
 - Gurobi
 - Google OR-Tools
-- NetworkX (minimum network flow solver)
+- NetworkX (Minimum Cost Network Flow solver)
 
 ## Overview
 
